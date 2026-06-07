@@ -1,0 +1,19 @@
+services:
+  chatbot:
+    build: ./backend
+    container_name: chatbot-ifisc
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend/data:/app/data
+    restart: always
+    # Sem volumes de código, a imagem é autossuficiente
+
+  frontend:
+    build: ./frontend
+    container_name: frontend-ifisc
+    ports:
+      - "3000:3000"
+    restart: always

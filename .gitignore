@@ -1,0 +1,17 @@
+# Variáveis de ambiente (contém chaves secretas)
+.env
+
+# Base vetorial gerada (pode ser recriada com ingest.py)
+backend/data/chroma_db/
+
+# Arquivos de cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Diretório de certificados (se houver)
+certbot/
