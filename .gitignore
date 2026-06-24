@@ -1,5 +1,7 @@
 # Variáveis de ambiente (contém chaves secretas)
 .env
+.env.local
+.env.*.local
 
 # Base vetorial gerada (pode ser recriada com ingest.py)
 backend/data/chroma_db/

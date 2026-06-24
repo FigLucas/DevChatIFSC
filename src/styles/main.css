@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Design Tokens - LIGHT THEME (Blue/Professional)
+   ============================================================ */
+:root {
+    --primary: #1e40af; /* blue-800 */
+    --primary-light: #2563eb; /* blue-600 */
+    --primary-dark: #1e3a8a; /* blue-900 */
+    --accent: #ca8a04; /* yellow-600 */
+
+    --bg-base: #f3f4f6;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9fafb;
+    --bg-input: #ffffff;
+    --bg-sidebar: #ffffff;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+
+    --chat-bot-bg: #f9fafb;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+}
+
+/* ============================================================
+   Scrollbars
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+.chat-scrollbar::-webkit-scrollbar { width: 5px; }
+.chat-scrollbar::-webkit-scrollbar-track { background: transparent; margin: 4px 0; }
+.chat-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+/* ============================================================
+   Glass / Backdrop
+   ============================================================ */
+.glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+.glass-light {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* ============================================================
+   Typography utilities
+   ============================================================ */
+.gradient-text {
+    background: linear-gradient(135deg, var(--ifsc-green), var(--ifsc-green-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================================
+   Logo
+   ============================================================ */
+.ifsc-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ifsc-logo-img {
+    width: 48px;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.ifsc-logo-text {
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-primary);
+}
+
+.ifsc-logo-subtitle {
+    font-weight: 500;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-8px) rotate(1deg); }
+    66% { transform: translateY(4px) rotate(-1deg); }
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-float {
+    animation: float 8s ease-in-out infinite;
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.4s ease-out forwards;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.25s ease-out forwards;
+}
+
+/* ============================================================
+   Textarea (auto-resize chat input)
+   ============================================================ */
+.chat-textarea {
+    min-height: 48px;
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    line-height: 1.5;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    field-sizing: content; /* modern browsers — progressive enhancement */
+}
+
+.chat-textarea::-webkit-scrollbar { width: 4px; }
+.chat-textarea::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+/* ============================================================
+   Prose (markdown content)
+   ============================================================ */
+.prose {
+    color: var(--text-secondary);
+}
+
+.prose pre {
+    background: #f3f4f6 !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: 14px 18px !important;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-primary);
+}
+
+.prose code:not(pre code) {
+    background: rgba(0, 134, 65, 0.1);
+    color: var(--ifsc-green-dark);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.875em;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.prose p { margin-bottom: 0.5rem; }
+.prose p:last-child { margin-bottom: 0; }
+.prose ul, .prose ol { margin: 0.25rem 0; padding-left: 1.25rem; }
+.prose li { margin-bottom: 0.125rem; }
+.prose strong { color: var(--text-primary); font-weight: 600; }
+.prose a { color: var(--ifsc-green); text-decoration: none; font-weight: 500; }
+.prose a:hover { text-decoration: underline; }
+.prose h1, .prose h2, .prose h3 { color: var(--text-primary); font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; }
+
+/* ============================================================
+   Tooltip
+   ============================================================ */
+.tooltip {
+    position: relative;
+}
+
+.tooltip:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    border: none;
+    color: var(--bg-card);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

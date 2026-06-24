@@ -7,13 +7,23 @@ services:
     env_file:
       - .env
     volumes:
+      - ./backend/app:/app/app
       - ./backend/data:/app/data
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     restart: always
-    # Sem volumes de código, a imagem é autossuficiente
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: frontend-ifisc
     ports:
       - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./index.html:/app/index.html
+      - ./vite.config.js:/app/vite.config.js
+      - ./package.json:/app/package.json
+      - ./package-lock.json:/app/package-lock.json
+    command: ["npx", "vite", "--host"]
     restart: always
