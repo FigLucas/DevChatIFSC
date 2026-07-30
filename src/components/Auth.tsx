@@ -132,7 +132,7 @@ function Auth() {
 
             <section className="relative flex min-h-dvh items-center justify-center overflow-hidden p-5 sm:p-10">
                 <div
-                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(22,101,52,0.11),transparent_60%)]"
+                    className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(20,73,156,0.12),transparent_60%)]"
                     aria-hidden="true"
                 />
                 <div

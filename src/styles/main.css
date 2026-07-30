@@ -2,29 +2,29 @@
 
 /* Design tokens */
 :root {
-    --primary: #166534;
-    --primary-light: #15803d;
-    --primary-dark: #0f3d24;
-    --primary-soft: #ecfdf3;
-    --accent: #a16207;
-    --accent-light: #facc15;
-    --ifsc-green: var(--primary);
-    --ifsc-green-dark: var(--primary-dark);
-    --ifsc-gold: var(--accent);
+    --primary: #14499c;
+    --primary-light: #2563b8;
+    --primary-dark: #0b2f69;
+    --primary-soft: #edf4ff;
+    --accent: #c96f00;
+    --accent-light: #f6a322;
+    --ifsc-blue: var(--primary);
+    --ifsc-blue-dark: var(--primary-dark);
+    --ifsc-orange: var(--accent);
 
-    --bg-base: #f5f7f6;
+    --bg-base: #f4f7fb;
     --bg-card: #ffffff;
-    --bg-card-hover: #f7faf8;
+    --bg-card-hover: #f6f9fd;
     --bg-input: #ffffff;
     --bg-sidebar: #ffffff;
-    --border: #dfe6e1;
-    --border-light: #edf1ee;
+    --border: #dbe4f0;
+    --border-light: #eaf0f7;
 
-    --text-primary: #17231c;
-    --text-secondary: #4d5d53;
-    --text-muted: #68766d;
+    --text-primary: #142033;
+    --text-secondary: #4d5f78;
+    --text-muted: #64748b;
 
-    --chat-bot-bg: #f7faf8;
+    --chat-bot-bg: #f6f9fd;
 }
 
 /* ============================================================
@@ -71,7 +71,7 @@ button:disabled {
 
 ::selection {
     color: var(--text-primary);
-    background: #bbf7d0;
+    background: #dbeafe;
 }
 
 /* ============================================================
@@ -84,11 +84,11 @@ button:disabled {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: #cbd5e1;
     border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: #94a3b8;
 }
 
 .chat-scrollbar::-webkit-scrollbar {
@@ -99,7 +99,7 @@ button:disabled {
     margin: 4px 0;
 }
 .chat-scrollbar::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: #cbd5e1;
     border-radius: 10px;
 }
 
@@ -133,7 +133,7 @@ button:disabled {
 }
 
 .field-control:hover:not(:disabled) {
-    border-color: #b8c7bd;
+    border-color: #afbed1;
 }
 
 .field-control:focus {
@@ -143,7 +143,7 @@ button:disabled {
 }
 
 .field-control:disabled {
-    background: #f1f4f2;
+    background: #f0f4f9;
 }
 
 .auth-grid {
@@ -158,7 +158,7 @@ button:disabled {
    Typography utilities
    ============================================================ */
 .gradient-text {
-    background: linear-gradient(135deg, var(--ifsc-green), var(--ifsc-green-dark));
+    background: linear-gradient(135deg, var(--ifsc-blue), var(--ifsc-blue-dark));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -263,7 +263,7 @@ button:disabled {
     max-height: 160px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: #d1d5db transparent;
+    scrollbar-color: #cbd5e1 transparent;
     line-height: 1.5;
     padding-top: 12px;
     padding-bottom: 12px;
@@ -274,7 +274,7 @@ button:disabled {
     width: 4px;
 }
 .chat-textarea::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: #cbd5e1;
     border-radius: 2px;
 }
 
@@ -286,19 +286,19 @@ button:disabled {
 }
 
 .prose pre {
-    background: #f3f4f6 !important;
-    border: 1px solid var(--border) !important;
+    background: #0b1f3a !important;
+    border: 1px solid #183e70 !important;
     border-radius: 10px !important;
     padding: 14px 18px !important;
     overflow-x: auto;
     font-size: 0.85rem;
     font-family: 'JetBrains Mono', monospace;
-    color: var(--text-primary);
+    color: #dbeafe;
 }
 
 .prose code:not(pre code) {
     background: var(--primary-soft);
-    color: var(--ifsc-green-dark);
+    color: var(--ifsc-blue-dark);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 0.875em;
@@ -324,7 +324,7 @@ button:disabled {
     font-weight: 600;
 }
 .prose a {
-    color: var(--ifsc-green);
+    color: var(--ifsc-blue);
     text-decoration: none;
     font-weight: 500;
 }

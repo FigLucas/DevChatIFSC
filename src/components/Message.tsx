@@ -183,7 +183,7 @@ function Message({ msg }: MessageProps) {
                                                             Copiar
                                                         </button>
                                                     </div>
-                                                    <pre className="overflow-x-auto p-3 bg-[#06080a] text-xs font-mono text-orange-200">
+                                                    <pre className="overflow-x-auto p-3 bg-[#0b1f3a] text-xs font-mono text-blue-100">
                                                         <code>{children}</code>
                                                     </pre>
                                                 </div>
@@ -191,7 +191,7 @@ function Message({ msg }: MessageProps) {
                                         }
                                         return (
                                             <code
-                                                className="bg-[var(--bg-input)] px-1.5 py-0.5 rounded-md text-orange-300 font-mono text-xs"
+                                                className="bg-[var(--primary-soft)] px-1.5 py-0.5 rounded-md text-[var(--primary-dark)] font-mono text-xs"
                                                 {...props}
                                             >
                                                 {children}
