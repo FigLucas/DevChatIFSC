@@ -1,80 +1,64 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import Auth from './Auth';
-import { AuthProvider } from '../context/AuthContext';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock do contexto de autenticação
+import Auth from './Auth';
+
+const { loginMock } = vi.hoisted(() => ({ loginMock: vi.fn() }));
+
 vi.mock('../context/AuthContext', () => ({
-    useAuth: () => ({
-        login: vi.fn(),
-    }),
-    AuthProvider: ({ children }) => <div>{children}</div>,
+    useAuth: () => ({ login: loginMock }),
 }));
 
 describe('Componente Auth', () => {
-    it('deve renderizar o formulário de login', () => {
-        render(
-            <AuthProvider>
-                <Auth />
-            </AuthProvider>
-        );
-        expect(screen.getByText('Login')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Senha')).toBeInTheDocument();
-        expect(screen.getByText('Entrar')).toBeInTheDocument();
+    beforeEach(() => {
+        loginMock.mockReset();
+        vi.unstubAllGlobals();
     });
 
-    it('deve mostrar erro ao submeter formulário com email inválido', async () => {
-        render(
-            <AuthProvider>
-                <Auth />
-            </AuthProvider>
-        );
+    it('renderiza o formulário de login acessível', () => {
+        render(<Auth />);
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'email-invalido' } });
-        fireEvent.change(screen.getByPlaceholderText('Senha'), { target: { value: '1234' } });
-        fireEvent.click(screen.getByText('Entrar'));
-
-        await waitFor(() => {
-            expect(screen.getByText('Email ou senha inválidos')).toBeInTheDocument();
-        });
+        expect(screen.getByRole('heading', { name: 'Bem-vindo de volta' })).toBeInTheDocument();
+        expect(screen.getByLabelText('Usuário')).toBeInTheDocument();
+        expect(screen.getByLabelText('Senha')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Entrar' })).toBeDisabled();
     });
 
-    it('deve chamar login ao submeter formulário com dados válidos', async () => {
-        const mockLogin = vi.fn();
-        vi.spyOn(require('../context/AuthContext'), 'useAuth').mockReturnValueOnce({
-            login: mockLogin,
-        });
+    it('não revela se o usuário ou a senha estão incorretos', async () => {
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 401 }));
+        render(<Auth />);
 
-        render(
-            <AuthProvider>
-                <Auth />
-            </AuthProvider>
-        );
+        fireEvent.change(screen.getByLabelText('Usuário'), { target: { value: 'desconhecido' } });
+        fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'senha' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'teste@exemplo.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Senha'), { target: { value: 'senha123' } });
-        fireEvent.click(screen.getByText('Entrar'));
-
-        await waitFor(() => {
-            expect(mockLogin).toHaveBeenCalledWith('fake-token-123');
-        });
+        expect(await screen.findByRole('alert')).toHaveTextContent('Usuário ou senha incorretos.');
     });
 
-    it('deve desabilitar botão de login enquanto carregando', async () => {
-        render(
-            <AuthProvider>
-                <Auth />
-            </AuthProvider>
+    it('inicia a sessão quando a API retorna um token', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: async () => ({ access_token: 'token-seguro', expires_in: 1800 }),
+            })
         );
+        render(<Auth />);
 
-        fireEvent.change(screen.getByPlaceholderText('Email'), { target: { value: 'teste@exemplo.com' } });
-        fireEvent.change(screen.getByPlaceholderText('Senha'), { target: { value: 'senha123' } });
-        fireEvent.click(screen.getByText('Entrar'));
+        fireEvent.change(screen.getByLabelText('Usuário'), { target: { value: 'admin' } });
+        fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'senha' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
-        await waitFor(() => {
-            expect(screen.getByText('Entrando...')).toBeInTheDocument();
-            expect(screen.getByText('Entrar')).toBeDisabled();
-        });
+        await waitFor(() => expect(loginMock).toHaveBeenCalledWith('token-seguro', 1800));
+    });
+
+    it('permite alternar a visibilidade da senha', () => {
+        render(<Auth />);
+        const password = screen.getByLabelText('Senha');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Mostrar senha' }));
+        expect(password).toHaveAttribute('type', 'text');
+        expect(screen.getByRole('button', { name: 'Ocultar senha' })).toBeInTheDocument();
     });
 });

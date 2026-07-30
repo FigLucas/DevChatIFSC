@@ -10,6 +10,7 @@
     "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css}'",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -22,6 +23,8 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-test-renderer": "^19.1.0",
     "@types/testing-library__jest-dom": "^5.14.9",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/ui": "^4.1.9",
     "eslint": "^8.56.0",

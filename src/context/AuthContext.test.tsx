@@ -1,42 +1,51 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { AuthProvider, useAuth } from './AuthContext';
 
-// Componente de teste para usar o contexto
 function TestComponent() {
     const { token, login, logout, loading } = useAuth();
     return (
         <div>
             <span data-testid="token">{token || 'null'}</span>
             <span data-testid="loading">{loading.toString()}</span>
-            <button onClick={() => login('test-token')}>Login</button>
+            <button onClick={() => login('test-token', 60)}>Login</button>
             <button onClick={logout}>Logout</button>
         </div>
     );
 }
 
 describe('AuthContext', () => {
-    it('deve iniciar com token nulo e loading true', () => {
+    beforeEach(() => {
+        sessionStorage.clear();
+        vi.useRealTimers();
+    });
+
+    it('inicia sem sessão', async () => {
         render(
             <AuthProvider>
                 <TestComponent />
             </AuthProvider>
         );
-        expect(screen.getByTestId('token').textContent).toBe('null');
-        expect(screen.getByTestId('loading').textContent).toBe('true');
+
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+        expect(screen.getByTestId('token')).toHaveTextContent('null');
     });
 
-    it('deve atualizar token ao fazer login', () => {
+    it('mantém o token apenas no armazenamento da sessão', () => {
         render(
             <AuthProvider>
                 <TestComponent />
             </AuthProvider>
         );
         fireEvent.click(screen.getByText('Login'));
-        expect(screen.getByTestId('token').textContent).toBe('test-token');
+
+        expect(screen.getByTestId('token')).toHaveTextContent('test-token');
+        expect(sessionStorage.getItem('ifsc-chat-session')).toContain('test-token');
+        expect(localStorage.getItem('token')).toBeNull();
     });
 
-    it('deve remover token ao fazer logout', () => {
+    it('remove token ao sair', () => {
         render(
             <AuthProvider>
                 <TestComponent />
@@ -44,17 +53,24 @@ describe('AuthContext', () => {
         );
         fireEvent.click(screen.getByText('Login'));
         fireEvent.click(screen.getByText('Logout'));
-        expect(screen.getByTestId('token').textContent).toBe('null');
+
+        expect(screen.getByTestId('token')).toHaveTextContent('null');
+        expect(sessionStorage.getItem('ifsc-chat-session')).toBeNull();
     });
 
-    it('deve carregar token do localStorage ao iniciar', () => {
-        localStorage.setItem('token', 'stored-token');
+    it('descarta automaticamente uma sessão expirada', async () => {
+        vi.useFakeTimers();
         render(
             <AuthProvider>
                 <TestComponent />
             </AuthProvider>
         );
-        expect(screen.getByTestId('token').textContent).toBe('stored-token');
-        localStorage.removeItem('token');
+        fireEvent.click(screen.getByText('Login'));
+
+        await act(async () => {
+            vi.advanceTimersByTime(60_001);
+        });
+
+        expect(screen.getByTestId('token')).toHaveTextContent('null');
     });
 });

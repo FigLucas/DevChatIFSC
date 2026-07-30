@@ -11,17 +11,20 @@ Chatbot institucional com **RAG (Retrieval-Augmented Generation)** para o Instit
 | **LLM** | Mistral AI (`mistral-medium-latest`) |
 | **Embeddings** | Mistral AI (`mistral-embed`) |
 | **Busca Web** | DuckDuckGo |
-| **Autenticação** | JWT (OAuth2 Password Flow) |
+| **Autenticação** | JWT com senhas PBKDF2 (OAuth2 Password Flow) |
 | **Containerização** | Docker + Docker Compose |
 
 ## Funcionalidades
 
 - Chat interativo com perguntas e respostas em linguagem natural
 - Base de conhecimento com ~150 PDFs institucionais (normas FAPESP, resoluções USP, guias IFSC, programas de bolsa)
-- Respostas combinam contexto do banco vetorial + busca web
+- Recuperação híbrida (embeddings + BM25), com diversidade e fontes por página
+- Busca web usada como fallback ou em perguntas que exigem informação atual
 - Renderização de Markdown (código, tabelas, listas, links)
 - Expansão de respostas longas, cópia e download em Markdown
 - Autenticação JWT
+- Proteção contra força bruta, expiração automática de sessão e CORS restrito
+- Markdown e links externos sanitizados
 - Sugestões de perguntas e referências dos documentos
 - Interface responsiva e animada com Tailwind CSS + Framer Motion
 
@@ -72,18 +75,45 @@ docker compose up --build
 | `npm run format` | Prettier |
 | `npm run type-check` | TypeScript type checking |
 | `npm test` | Testes (Vitest) |
+| `cd backend && python -m unittest discover -s tests` | Testes unitários do RAG |
+
+### Atualizar a base de conhecimento
+
+Depois de adicionar ou remover PDFs em `backend/data/pdfs`, reconstrua o índice:
+
+```bash
+cd backend
+python ingest.py
+```
+
+A ingestão normaliza o texto, remove cabeçalhos e rodapés repetidos, gera IDs
+determinísticos e só substitui a base anterior quando a nova estiver completa.
+Reinicie a API depois da atualização para recarregar o índice híbrido.
 
 ## Ambiente
 
-Copie `.env.example` para `.env` e configure as chaves da API Mistral AI:
+Copie `.env.example` para `.env`, gere uma chave JWT e configure a API Mistral AI:
 
-```env
-MISTRAL_API_KEY=sua_chave_aqui
+```bash
+cp .env.example .env
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-## Autenticação
+Defina o valor gerado em `SECRET_KEY`. Em produção, configure também
+`APP_ENV=production`, `ALLOWED_ORIGINS` com o domínio HTTPS real e não use as
+contas de demonstração.
 
-Usuários padrão (em memória):
+Por padrão, `RAG_WEB_SEARCH_MODE=fallback`: a web só é consultada quando a
+recuperação local tem baixa confiança ou a pergunta pede algo atual, vigente ou
+com prazo. Use `off` para operar exclusivamente com os PDFs ou `always` para
+manter o comportamento de busca em toda pergunta. Os demais limites e limiares
+do RAG estão documentados em `.env.example`.
+
+## Autenticação de demonstração
+
+As contas abaixo existem somente para desenvolvimento. As senhas são armazenadas
+como hashes PBKDF2 no código; substitua o módulo de usuários por um banco de dados
+antes de publicar o serviço.
 
 | Usuário | Senha |
 |---------|-------|

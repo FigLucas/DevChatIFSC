@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Dependências do frontend
+node_modules/
+
 # Base vetorial gerada (pode ser recriada com ingest.py)
 backend/data/chroma_db/
 

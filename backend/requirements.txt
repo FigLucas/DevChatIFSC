@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 python-jose[cryptography]
-passlib[bcrypt]
 python-multipart
 langchain
 langchain-community
@@ -10,7 +9,6 @@ langchain-text-splitters
 langchain-chroma
 langchain-mistralai
 chromadb
-sentence-transformers
 pymupdf
 python-dotenv
 jinja2
