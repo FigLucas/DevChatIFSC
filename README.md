@@ -10,7 +10,7 @@ Chatbot institucional com **RAG (Retrieval-Augmented Generation)** para o Instit
 | **Backend** | Python 3.11, FastAPI, LangChain, ChromaDB |
 | **LLM** | Mistral AI (`mistral-medium-latest`) |
 | **Embeddings** | Mistral AI (`mistral-embed`) |
-| **Busca Web** | DuckDuckGo |
+| **Busca Web** | DDGS (metabusca) |
 | **Autenticação** | JWT com senhas PBKDF2 (OAuth2 Password Flow) |
 | **Containerização** | Docker + Docker Compose |
 

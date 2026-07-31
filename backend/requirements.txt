@@ -13,4 +13,4 @@ pymupdf
 python-dotenv
 jinja2
 gunicorn
-duckduckgo-search
+ddgs>=9.9,<10

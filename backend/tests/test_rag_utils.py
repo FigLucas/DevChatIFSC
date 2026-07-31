@@ -3,7 +3,12 @@ from types import SimpleNamespace
 
 from app.rag_utils import (
     BM25Index,
+    canonical_source_url,
+    ensure_source_coverage,
+    expand_retrieval_query,
     format_documents,
+    is_allowed_source,
+    is_ic_opportunity_query,
     normalize_text,
     reciprocal_rank_fusion,
     searchable_document_text,
@@ -69,6 +74,54 @@ class RAGUtilsTests(unittest.TestCase):
         )
         self.assertIn("[D1] Fonte: guia.pdf, p. 3", context)
         self.assertIn("Conteúdo confirmado.", context)
+
+    def test_excludes_compilations_with_rules_from_other_usp_units(self):
+        self.assertFalse(is_allowed_source("FAQ-IFSC.pdf"))
+        self.assertFalse(is_allowed_source("USP - Universidade de São Paulo.pdf"))
+        self.assertTrue(
+            is_allowed_source("Auxílios e Bolsas - Graduação IFSC USP.pdf")
+        )
+
+    def test_expands_broad_ic_opportunity_query_with_funding_routes(self):
+        question = "Quais oportunidades de bolsa de iniciação científica há no IFSC?"
+        expanded = expand_retrieval_query(question)
+        self.assertTrue(is_ic_opportunity_query(question))
+        for route in ("PIBIC", "PIBITI", "FAPESP", "PUB"):
+            self.assertIn(route, expanded)
+
+    def test_does_not_expand_unrelated_query(self):
+        question = "Qual é o horário da biblioteca?"
+        self.assertFalse(is_ic_opportunity_query(question))
+        self.assertEqual(expand_retrieval_query(question), question)
+
+    def test_context_includes_canonical_official_url_when_known(self):
+        item = document(
+            "A FAPESP recebe propostas.",
+            "FAPESP Bolsa de Iniciação Científica.pdf",
+        )
+        context = format_documents([item], max_chars=500)
+        self.assertEqual(
+            canonical_source_url(item),
+            "https://fapesp.br/bolsas/ic",
+        )
+        self.assertIn("URL oficial: https://fapesp.br/bolsas/ic", context)
+
+    def test_ensures_authoritative_source_coverage(self):
+        first = document("PIBIC e PIBITI", "guia.pdf", chunk=0)
+        duplicate = document("Mais detalhes", "guia.pdf", chunk=1)
+        fapesp = document("Bolsa de IC em fluxo contínuo", "fapesp.pdf")
+        pub = document("PUB pesquisa e inovação", "pub.pdf")
+        selected = ensure_source_coverage(
+            [first, duplicate, fapesp],
+            [first, duplicate, fapesp, pub],
+            required_sources=("guia.pdf", "fapesp.pdf", "pub.pdf"),
+            query="bolsas de iniciação científica FAPESP PUB",
+            limit=3,
+        )
+        self.assertEqual(
+            {item.metadata["source"] for item in selected},
+            {"guia.pdf", "fapesp.pdf", "pub.pdf"},
+        )
 
 
 if __name__ == "__main__":

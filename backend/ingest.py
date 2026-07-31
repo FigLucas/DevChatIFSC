@@ -14,7 +14,7 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_mistralai import MistralAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from app.rag_utils import normalize_text
+from app.rag_utils import is_allowed_source, normalize_text
 
 load_dotenv()
 
@@ -97,7 +97,11 @@ def _replace_directory(build_dir: Path, target_dir: Path) -> None:
 
 
 def main() -> None:
-    pdf_files = sorted(glob.glob(str(PDF_DIR / "*.pdf")))
+    pdf_files = [
+        pdf_path
+        for pdf_path in sorted(glob.glob(str(PDF_DIR / "*.pdf")))
+        if is_allowed_source(Path(pdf_path).name)
+    ]
     if not pdf_files:
         print(f"Nenhum PDF encontrado em {PDF_DIR}")
         return
