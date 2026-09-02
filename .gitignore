@@ -6,6 +6,13 @@
 # Dependências do frontend
 node_modules/
 
+# Artefatos gerados por build e testes
+dist/
+coverage/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
 # Base vetorial gerada (pode ser recriada com ingest.py)
 backend/data/chroma_db/
 
@@ -13,6 +20,13 @@ backend/data/chroma_db/
 __pycache__/
 *.pyc
 *.pyo
+.venv/
+venv/
+
+# Logs e arquivos de IDE
+*.log
+.idea/
+.vscode/
 
 # Arquivos de sistema
 .DS_Store
@@ -20,3 +34,4 @@ Thumbs.db
 
 # Diretório de certificados (se houver)
 certbot/
+secrets/

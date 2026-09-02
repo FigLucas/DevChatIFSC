@@ -1,14 +1,15 @@
 import logging
 import os
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from math import ceil
-from typing import Sequence
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from chromadb.config import Settings as ChromaSettings
 from ddgs import DDGS
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
@@ -40,6 +41,14 @@ _IC_AUTHORITATIVE_SOURCES = (
     "guia-programa-iniciacao-cientifica.pdf",
     "FAPESP Bolsa de Iniciação Científica.pdf",
 )
+_DEFAULT_WEB_DOMAINS = (
+    "usp.br",
+    "fapesp.br",
+    "cnpq.br",
+    "capes.gov.br",
+    "gov.br",
+)
+_DOMAIN_RE = re.compile(r"^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$")
 
 template = """Você é um assistente institucional do IFSC-USP.
 
@@ -129,9 +138,7 @@ class RAGSettings:
             max_per_source=_env_int("RAG_MAX_PER_SOURCE", 3, 1, 6),
             max_context_chars=_env_int("RAG_MAX_CONTEXT_CHARS", 12_000, 2_000, 30_000),
             min_dense_score=_env_float("RAG_MIN_DENSE_SCORE", 0.25, 0.0, 1.0),
-            min_lexical_overlap=_env_float(
-                "RAG_MIN_LEXICAL_OVERLAP", 0.25, 0.0, 1.0
-            ),
+            min_lexical_overlap=_env_float("RAG_MIN_LEXICAL_OVERLAP", 0.25, 0.0, 1.0),
             web_search_mode=web_search_mode,
             web_max_results=_env_int("RAG_WEB_MAX_RESULTS", 4, 1, 8),
         )
@@ -223,6 +230,9 @@ def get_llm():
     return ChatMistralAI(
         model=os.getenv("MISTRAL_CHAT_MODEL", "mistral-medium-latest"),
         temperature=0,
+        max_tokens=_env_int("MISTRAL_MAX_TOKENS", 2_000, 256, 8_000),
+        max_retries=_env_int("MISTRAL_MAX_RETRIES", 2, 0, 5),
+        timeout=_env_int("MISTRAL_TIMEOUT_SECONDS", 90, 10, 180),
     )
 
 
@@ -246,7 +256,7 @@ def _current_date():
 
 def _web_search_plan(question: str) -> tuple[list[str], tuple[str, ...]]:
     if not is_ic_opportunity_query(question):
-        return [question], ()
+        return [question], _allowed_web_domains()
 
     current_year = _current_date().year
     return (
@@ -266,6 +276,17 @@ def _web_search_plan(question: str) -> tuple[list[str], tuple[str, ...]]:
     )
 
 
+def _allowed_web_domains() -> tuple[str, ...]:
+    configured = os.getenv("RAG_ALLOWED_WEB_DOMAINS", "").strip()
+    domains = configured.split(",") if configured else _DEFAULT_WEB_DOMAINS
+    normalized = tuple(
+        dict.fromkeys(domain.strip().lower().rstrip(".") for domain in domains)
+    )
+    if not normalized or any(not _DOMAIN_RE.fullmatch(domain) for domain in normalized):
+        raise RuntimeError("RAG_ALLOWED_WEB_DOMAINS contém um domínio inválido")
+    return normalized
+
+
 def search_web(
     queries: str | Sequence[str],
     max_results: int = 4,
@@ -282,9 +303,7 @@ def search_web(
         for query in queries:
             try:
                 with DDGS() as ddgs:
-                    results.extend(
-                        ddgs.text(query[:500], max_results=per_query_limit)
-                    )
+                    results.extend(ddgs.text(query[:500], max_results=per_query_limit))
             except Exception:
                 failed_queries += 1
                 logger.warning("Falha na busca web para uma consulta", exc_info=True)
@@ -297,10 +316,14 @@ def search_web(
         seen_urls = set()
         for result in results:
             url = str(result.get("href", "")).strip()
+            if len(url) > 2_048 or re.search(r"[\x00-\x20\x7f]", url):
+                continue
             parsed = urlparse(url)
             if (
                 parsed.scheme not in {"http", "https"}
                 or not parsed.netloc
+                or parsed.username is not None
+                or parsed.password is not None
                 or url in seen_urls
                 or not _hostname_allowed(parsed.hostname or "", allowed_domains)
             ):
@@ -388,6 +411,11 @@ def get_rag_chain():
     vectorstore = Chroma(
         persist_directory=CHROMA_PATH,
         embedding_function=embeddings,
+        client_settings=ChromaSettings(
+            anonymized_telemetry=False,
+            is_persistent=True,
+            persist_directory=CHROMA_PATH,
+        ),
     )
     retriever = HybridRetriever(vectorstore, settings)
     llm = get_llm()

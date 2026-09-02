@@ -2,8 +2,9 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, StringConstraints
 
-
-Question = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
+Question = Annotated[
+    str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)
+]
 
 
 class Token(BaseModel):
