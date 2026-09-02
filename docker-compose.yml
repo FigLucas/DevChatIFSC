@@ -1,7 +1,8 @@
 services:
   chatbot:
-    build: ./backend
-    container_name: chatbot-ifisc
+    build:
+      context: ./backend
+      target: production
     ports:
       - "8000:8000"
     env_file:
@@ -12,22 +13,21 @@ services:
       - ./backend/app:/app/app
       - ./backend/data:/app/data
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-    restart: always
+    restart: unless-stopped
 
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-    container_name: frontend-ifisc
+      target: development
     ports:
       - "3000:3000"
     volumes:
       - ./src:/app/src
       - ./index.html:/app/index.html
-      - ./vite.config.js:/app/vite.config.js
+      - ./vite.config.mjs:/app/vite.config.mjs
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
-    command: ["npx", "vite", "--host"]
-    restart: always
+    restart: unless-stopped
