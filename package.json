@@ -1,61 +1,48 @@
 {
-  "name": "devchat",
-  "version": "1.0.0",
-  "description": "DevChat - Ferramenta de chat para desenvolvedores",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
-    "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css}'",
-    "type-check": "tsc --noEmit",
-    "test": "vitest run",
-    "prepare": "husky install"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.3.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^25.9.3",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-test-renderer": "^19.1.0",
-    "@types/testing-library__jest-dom": "^5.14.9",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/ui": "^4.1.9",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "husky": "^9.0.11",
-    "jsdom": "^29.1.1",
-    "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5",
-    "tailwindcss": "^4.3.1",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.css": [
-      "prettier --write"
-    ]
-  },
-  "dependencies": {
-    "@tailwindcss/forms": "^0.5.11",
-    "framer-motion": "^12.40.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "react-icons": "^5.6.0",
-    "react-markdown": "^10.1.0",
-    "rehype-sanitize": "^6.0.0",
-    "remark-gfm": "^4.0.1",
-    "vite": "^8.0.16"
-  }
+    "name": "devchat",
+    "version": "1.0.0",
+    "description": "DevChat - Ferramenta de chat para desenvolvedores",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+        "lint:fix": "eslint 'src/**/*.{js,jsx,ts,tsx}' --fix",
+        "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css}'",
+        "type-check": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.3.1",
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.1",
+        "@types/node": "^25.9.3",
+        "@types/react": "^19.2.17",
+        "@types/react-dom": "^19.2.3",
+        "@eslint/js": "^10.0.1",
+        "@typescript-eslint/eslint-plugin": "^8.69.0",
+        "@typescript-eslint/parser": "^8.69.0",
+        "@vitejs/plugin-react": "^6.0.2",
+        "@vitest/ui": "^4.1.9",
+        "eslint": "^10.9.1",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.6",
+        "globals": "^17.12.0",
+        "jsdom": "^29.1.1",
+        "prettier": "^3.2.5",
+        "tailwindcss": "^4.3.1",
+        "typescript": "^6.0.3",
+        "vite": "^8.0.16",
+        "vitest": "^4.1.9"
+    },
+    "dependencies": {
+        "framer-motion": "^12.40.0",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "react-icons": "^5.6.0",
+        "react-markdown": "^10.1.0",
+        "rehype-sanitize": "^6.0.0",
+        "remark-gfm": "^4.0.1"
+    }
 }
