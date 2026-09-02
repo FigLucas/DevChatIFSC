@@ -30,7 +30,9 @@ class RAGUtilsTests(unittest.TestCase):
         self.assertEqual(normalize_text(text), "Iniciação científica\n\nPrazo final")
 
     def test_tokenizer_is_accent_insensitive_and_removes_stopwords(self):
-        self.assertEqual(tokenize("Qual é o prazo da iniciação?"), ["prazo", "iniciacao"])
+        self.assertEqual(
+            tokenize("Qual é o prazo da iniciação?"), ["prazo", "iniciacao"]
+        )
 
     def test_bm25_prioritizes_exact_institutional_terms(self):
         texts = [
@@ -78,9 +80,7 @@ class RAGUtilsTests(unittest.TestCase):
     def test_excludes_compilations_with_rules_from_other_usp_units(self):
         self.assertFalse(is_allowed_source("FAQ-IFSC.pdf"))
         self.assertFalse(is_allowed_source("USP - Universidade de São Paulo.pdf"))
-        self.assertTrue(
-            is_allowed_source("Auxílios e Bolsas - Graduação IFSC USP.pdf")
-        )
+        self.assertTrue(is_allowed_source("Auxílios e Bolsas - Graduação IFSC USP.pdf"))
 
     def test_expands_broad_ic_opportunity_query_with_funding_routes(self):
         question = "Quais oportunidades de bolsa de iniciação científica há no IFSC?"

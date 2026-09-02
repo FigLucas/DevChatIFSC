@@ -8,6 +8,7 @@ import tempfile
 from collections import Counter
 from pathlib import Path
 
+from chromadb.config import Settings as ChromaSettings
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -131,7 +132,9 @@ def main() -> None:
 
     ids = [_chunk_id(chunk) for chunk in chunks]
     if len(ids) != len(set(ids)):
-        raise RuntimeError("Foram gerados IDs de chunks duplicados; ingestão cancelada.")
+        raise RuntimeError(
+            "Foram gerados IDs de chunks duplicados; ingestão cancelada."
+        )
 
     print(f"{len(chunks)} chunks extraídos de {len(pdf_files)} PDFs.")
     embeddings = MistralAIEmbeddings(
@@ -149,6 +152,11 @@ def main() -> None:
             ids=ids,
             persist_directory=str(build_dir),
             collection_metadata={"hnsw:space": "cosine"},
+            client_settings=ChromaSettings(
+                anonymized_telemetry=False,
+                is_persistent=True,
+                persist_directory=str(build_dir),
+            ),
         )
         del vectordb
         gc.collect()

@@ -2,13 +2,20 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
     const apiUrl = env.VITE_API_URL || 'http://localhost:8000';
-    const apiOrigin = apiUrl.startsWith('http') ? new URL(apiUrl).origin : "'self'";
+    let apiOrigin = "'self'";
+    if (!apiUrl.startsWith('/')) {
+        const parsedApiUrl = new URL(apiUrl);
+        if (!['http:', 'https:'].includes(parsedApiUrl.protocol)) {
+            throw new Error('VITE_API_URL deve usar HTTP(S) ou um caminho relativo');
+        }
+        apiOrigin = parsedApiUrl.origin;
+    }
+    const scriptSources = mode === 'development' ? "'self' 'unsafe-inline'" : "'self'";
     const securityHeaders = {
-        'Content-Security-Policy': `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' ${apiOrigin} https:; img-src 'self' data: https:`,
+        'Content-Security-Policy': `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src ${scriptSources}; style-src 'self' 'unsafe-inline'; connect-src 'self' ${apiOrigin}; img-src 'self' data:`,
         'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
         'X-Content-Type-Options': 'nosniff',
@@ -16,10 +23,7 @@ export default defineConfig(({ mode }) => {
     };
 
     return {
-        plugins: [
-            react(),
-            tailwindcss(),
-        ],
+        plugins: [react(), tailwindcss()],
         server: {
             port: 3000,
             open: true,

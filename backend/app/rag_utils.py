@@ -2,9 +2,8 @@ import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Iterable, Sequence
-
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+", re.IGNORECASE)
 _CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -138,8 +137,7 @@ def canonical_source_url(document: object) -> str:
 def is_ic_opportunity_query(question: str) -> bool:
     normalized = " ".join(tokenize(question))
     return bool(
-        _IC_OPPORTUNITY_RE.search(normalized)
-        and _OPPORTUNITY_RE.search(normalized)
+        _IC_OPPORTUNITY_RE.search(normalized) and _OPPORTUNITY_RE.search(normalized)
     )
 
 
@@ -212,7 +210,9 @@ class BM25Index:
                 continue
             document_frequency = len(postings)
             inverse_document_frequency = math.log(
-                1 + (self.document_count - document_frequency + 0.5) / (document_frequency + 0.5)
+                1
+                + (self.document_count - document_frequency + 0.5)
+                / (document_frequency + 0.5)
             )
             for document_index, term_frequency in postings:
                 length = self.lengths[document_index]
@@ -220,7 +220,8 @@ class BM25Index:
                 if self.average_length:
                     normalization += self.b * length / self.average_length
                 score = inverse_document_frequency * (
-                    term_frequency * (self.k1 + 1)
+                    term_frequency
+                    * (self.k1 + 1)
                     / (term_frequency + self.k1 * normalization)
                 )
                 scores[document_index] += score
